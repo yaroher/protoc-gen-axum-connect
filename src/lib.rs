@@ -6,10 +6,11 @@ use prost::Message;
 use prost_types::compiler::CodeGeneratorRequest;
 use protoc_gen_prost::{Generator, InvalidParameter, ModuleRequestSet, Param, Params};
 
-use crate::generator::AxumConnectGenerator;
+use crate::{generator::AxumConnectGenerator, serde_gen::AxumConnectSerdeGenerator};
 
 mod generator;
 mod resolver;
+mod serde_gen;
 mod util;
 
 /// Execute the axum-connect generator from a raw [`CodeGeneratorRequest`].
@@ -32,7 +33,21 @@ pub fn execute(raw_request: &[u8]) -> protoc_gen_prost::Result {
     )];
     extern_path.extend(params.extern_path.clone());
 
-    let files = AxumConnectGenerator::new(extern_path).generate(&module_request_set)?;
+    let files = if params.serde {
+        let mut builder = pbjson_build::Builder::new();
+        for file in &proto_files {
+            builder.register_file_descriptor(file.clone());
+        }
+        for (proto_path, rust_path) in &extern_path {
+            builder.extern_path(proto_path, rust_path);
+        }
+
+        AxumConnectGenerator::new(extern_path)
+            .chain(AxumConnectSerdeGenerator::new(builder))
+            .generate(&module_request_set)?
+    } else {
+        AxumConnectGenerator::new(extern_path).generate(&module_request_set)?
+    };
 
     Ok(files)
 }
@@ -42,6 +57,7 @@ struct Parameters {
     default_package_filename: Option<String>,
     extern_path: Vec<(String, String)>,
     flat_output_dir: bool,
+    serde: bool,
 }
 
 impl str::FromStr for Parameters {
@@ -71,6 +87,15 @@ impl str::FromStr for Parameters {
                 } => ret_val.flat_output_dir = true,
                 Param::Value {
                     param: "flat_output_dir",
+                    value: "false",
+                } => (),
+                Param::Parameter { param: "serde" }
+                | Param::Value {
+                    param: "serde",
+                    value: "true",
+                } => ret_val.serde = true,
+                Param::Value {
+                    param: "serde",
                     value: "false",
                 } => (),
                 _ => return Err(InvalidParameter::from(param)),
