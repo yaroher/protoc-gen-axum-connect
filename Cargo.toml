@@ -1,6 +1,6 @@
 [package]
 name = "protoc-gen-axum-connect"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Yaroslav Stolbunov <yaroher2442@gmail.com>"]
 description = "Protocol Buffers compiler plugin for axum-connect services"
 repository = "https://github.com/yaroher/protoc-gen-axum-connect"
@@ -14,7 +14,6 @@ categories = ["encoding"]
 exclude = ["proto"]
 
 [dependencies]
-pbjson-build = "0.9.0"
 proc-macro2 = "1.0.103"
 prost-build = "0.14.1"
 prost-types = { version = "0.14.1",features = ["arbitrary"] }
