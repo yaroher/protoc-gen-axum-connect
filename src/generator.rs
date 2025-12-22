@@ -54,7 +54,8 @@ impl AxumConnectGenerator {
             buf.push_str("\");\n");
         })?);
 
-        let content = format!("// @generated\n{}", services.to_string());
+        let file = syn::parse2(services).expect("valid rust file");
+        let content = format!("// @generated\n{}", prettyplease::unparse(&file));
         let out_dir = request.output_dir();
         res.push(File {
             name: Some(out_dir + &output_filename),

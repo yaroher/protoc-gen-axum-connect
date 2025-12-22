@@ -264,10 +264,11 @@ dependencies = [
 
 [[package]]
 name = "protoc-gen-axum-connect"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "heck",
  "pbjson-build",
+ "prettyplease",
  "proc-macro2",
  "prost",
  "prost-build",
