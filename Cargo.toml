@@ -1,6 +1,6 @@
 [package]
 name = "protoc-gen-axum-connect"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Yaroslav Stolbunov <yaroher2442@gmail.com>"]
 description = "Protocol Buffers compiler plugin for axum-connect services"
 repository = "https://github.com/yaroher/protoc-gen-axum-connect"
